@@ -1,0 +1,17 @@
+{
+  "name": "obniz-temperature",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "form-data": "^2.3.3",
+    "jquery": "^3.3.1",
+    "obniz": "^1.9.4",
+    "request": "^2.88.0"
+  }
+}
