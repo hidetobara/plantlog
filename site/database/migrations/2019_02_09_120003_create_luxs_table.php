@@ -15,9 +15,9 @@ class CreateLuxsTable extends Migration
     {
         Schema::create('luxs', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('sensor_id')->nullable();
-            $table->datetime('time')->nullable();
-            $table->integer('lux')->nullable();
+            $table->integer('sensor_id');
+            $table->datetime('time');
+            $table->integer('lux');
             $table->index(['sensor_id', 'time']);
         });
     }

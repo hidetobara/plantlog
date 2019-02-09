@@ -15,9 +15,9 @@ class CreateCo2sTable extends Migration
     {
         Schema::create('co2s', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('sensor_id')->nullable();
-            $table->datetime('time')->nullable();
-            $table->integer('co2')->nullable();
+            $table->integer('sensor_id');
+            $table->datetime('time');
+            $table->integer('co2');
             $table->index(['sensor_id', 'time']);
         });
     }

@@ -17,6 +17,9 @@ class MySession
 
     private $user;
 
+    public function getUserId(){ return $this->user ? $this->user->id: 0; }
+    public function getUserName(){ return $this->user ? $this->user->name: 0; }
+
     private $data = [];
     private $messages = [];
     private $errors = [];
@@ -27,7 +30,7 @@ class MySession
         if(!$this->user) return;
         
         $this->data['my']['id'] = $this->user->id;
-        $this->data['my']['name'] = $this->user->name;        
+        $this->data['my']['name'] = $this->user->name;
     }
 
     public function add($name, $value)

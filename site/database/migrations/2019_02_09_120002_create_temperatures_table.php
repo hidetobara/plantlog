@@ -15,9 +15,9 @@ class CreateTemperaturesTable extends Migration
     {
         Schema::create('temperatures', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('sensor_id')->nullable();
-            $table->datetime('time')->nullable();
-            $table->decimal('temperature', 3, 1)->nullable();
+            $table->integer('sensor_id');
+            $table->datetime('time');
+            $table->decimal('temperature', 3, 1);
             $table->index(['sensor_id', 'time']);
         });
     }

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateExperimentsTable extends Migration
+class CreateObnizsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,13 @@ class CreateExperimentsTable extends Migration
      */
     public function up()
     {
-        Schema::create('experiments', function (Blueprint $table) {
+        Schema::create('obnizs', function (Blueprint $table) {
             $table->increments('id');
-            $table->Integer('sensor_id');
-            $table->datetime('time');
-            $table->decimal('a', 6, 2);
-            $table->decimal('b', 6, 2);
-            $table->index(['sensor_id', 'time']);
+            $table->char('name', 16);
+            $table->integer('user_id');
+            $table->char('description', 32);
+            $table->timestamps();
+            $table->index(['user_id']);
         });
     }
 
@@ -30,6 +30,6 @@ class CreateExperimentsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('experiments');
+        Schema::dropIfExists('obnizs');
     }
 }
