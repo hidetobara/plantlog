@@ -163,8 +163,8 @@ class RecordController extends Controller
             for($t = clone($from); $t < $to; $t->modify("+{$interval} hour"))
             {
                 $key = $t->format('Y-m-d H:00');
-                $co2 = empty($times[$key]) ? null: $times[$key];
-                $records[] = ['time' => $key, 'value' => $co2];
+                $value = empty($times[$key]) ? null: $times[$key];
+                $records[] = ['time' => $key, 'value' => $value];
             }
             $s->add('records', $records);
         }

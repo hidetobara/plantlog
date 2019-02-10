@@ -10,5 +10,5 @@ class Lux extends Model
     protected $dates = ['time'];
     public $timestamps = false;
 
-    public function getValue(){ return $this->co2; }
+    public function getValue(){ return $this->lux; }
 }
