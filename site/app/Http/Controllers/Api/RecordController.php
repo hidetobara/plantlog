@@ -156,13 +156,13 @@ class RecordController extends Controller
             $times = [];
             foreach($func($from,$to) as $row)
             {
-                $key = $row->time->format('Y-m-d H:i');
+                $key = $row->time->format('Y-m-d H:00');
                 $times[$key] = $row->getValue();
             }
             $records = [];
             for($t = clone($from); $t < $to; $t->modify("+{$interval} hour"))
             {
-                $key = $t->format('Y-m-d H:i');
+                $key = $t->format('Y-m-d H:00');
                 $co2 = empty($times[$key]) ? null: $times[$key];
                 $records[] = ['time' => $key, 'value' => $co2];
             }
@@ -178,7 +178,7 @@ class RecordController extends Controller
     private function getNow()
     {
         $now = Carbon::now();
-        $now->setTime($now->hour, 0);
+        $now->setTime($now->hour, $now->minute, 0);
         return $now;
     }
 }

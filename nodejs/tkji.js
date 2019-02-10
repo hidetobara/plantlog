@@ -15,7 +15,7 @@ _obniz.onconnect = async function()
 		extend.p("temp="+t);
 		request.get(
 			{
-				url: "http://49.212.141.20/Imager/temperature.php",
+				url: "http://49.212.141.20/plant/api/record/update_temperature",
 				qs: { sensor: extend.getId(), temperature: t }
 			},
 			function(err, res, body){ extend.p("body="+body); }

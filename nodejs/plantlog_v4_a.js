@@ -168,9 +168,9 @@ function device_MHZ19B(obniz, num_tx, num_rx)
 		_dev_co2.clear();
 
 		print("saved id="+id +",temp="+t+",co2="+c+",lux="+l);
-		upload("http://49.212.141.20/Imager/temperature.php", {sensor: id, temperature: t });
-		upload("http://49.212.141.20/Imager/co2.php", {sensor: id, co2: c });
-		upload("http://49.212.141.20/Imager/lux.php", {sensor: id, lux: l });
+		upload("http://49.212.141.20/plant/api/record/update_temperature", {sensor: id, temperature: t });
+		upload("http://49.212.141.20/plant/api/record/update_co2", {sensor: id, co2: c });
+		upload("http://49.212.141.20/plant/api/record/update_lux", {sensor: id, lux: l });
 	}
 
 	var _that = this;

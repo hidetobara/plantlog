@@ -1,3 +1,4 @@
+var request = require("request");
 
 module.exports = function(obniz, id)
 {
@@ -24,6 +25,13 @@ module.exports = function(obniz, id)
 	}
 	function dump(m){ if(_debug) console.log(_id+":"+m); }
 
+	this.upload = function(url, params)
+	{
+		request.get({
+			url: url,
+			qs: params
+		}, function(err, res, body){ dump(url + "=" + body); });
+	}
 	this.p = function(s){ print(s); }
 	this.getId = function(){ return _id; }
 
@@ -133,5 +141,66 @@ module.exports = function(obniz, id)
 		var _that = this;
 		return this;
 	}
+
+	this.MHZ19B = function(num_tx, num_rx)
+	{
+		var _uart = _obniz.getFreeUart();
+		var _co2s = [];
+		function get_median(list){ if(list.length == 0) return 0; list.sort(function(a,b){return a-b;}); return list[ Math.floor(list.length/2) ]; }
+
+		this.reset = function()
+		{
+			dump("mhz> reset");
+			for(var i=0; i<3; i++){ _uart.send([0xFF, 0x01, 0x79, 0xA0, 0x00, 0x00, 0x00, 0x00, 0xE6]); _obniz.wait(1000); }
+		}
+		
+		_uart.start({tx: num_tx, rx: num_rx, baud:9600, bits:8, stop:1, parity:"off", flowcontrol:"off"});
+		setInterval(async function(){
+		var command = [0xFF, 0x01, 0x86, 0x00, 0x00, 0x00, 0x00, 0x00, 0x79];
+		_uart.send(command);
+		await _obniz.wait(100);
+		var res = _uart.readBytes();
+		if(res.length < 9 || res[0] != 255 || res[1] != 134){ dump("mhz> " +res); return; }
+		var c = res[2] * 256 + res[3];
+
+		dump("mhz> co2=" + c);
+		if(c == 0 || c == 5000){ reset(); return; }
+		_co2s.push(c);
+		}, 5*1000);
+
+		this.get_co2 = function(){ return get_median(_co2s); }
+		this.clear = function(){ _co2s = []; }
+
+		var _that = this;
+		return this;
+	}
+
+	this.TEPT4400 = function(num_top, num_vcc)
+	{
+		_obniz["ad"+num_top].start();
+		_obniz["ad"+num_vcc].start();
+		var _list = [];
+		setInterval(function(){
+			var down = _obniz["ad"+num_top].value;
+			var up = _obniz["ad"+num_vcc].value;
+			dump("tept> "+up+" "+down);
+			if(up < down) return;
+			_list.push(up - down);
+		}, 10*1000);
+
+		function get_median(list){ if(list.length == 0) return 0; list.sort(function(a,b){return a-b;}); return list[ Math.floor(list.length/2) ]; }
+		this.get_lux = function()
+		{
+			var vol = get_median(_list);
+			if(vol < 0.0) return 0;
+			var lux = 7232.4 * vol + 2.5;
+			return Math.floor(lux / 100) * 100;
+		}
+		this.clear = function(){ _list = []; }
+
+		var _that = this;
+		return this;
+	}
+
 	return this;
 }

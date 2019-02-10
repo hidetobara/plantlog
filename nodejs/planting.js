@@ -31,7 +31,7 @@ function Measuring(id, name)
 	this.save_temperature = function(id, t)
 	{
 		request.get({
-			url: "http://49.212.141.20/Imager/temperature.php",
+			url: "http://49.212.141.20/plant/api/record/update_temperature",
 			qs: { sensor: id, temperature: t }
 			},
 			function(err, res, body){ dump("temperature="+body); }
@@ -41,7 +41,7 @@ function Measuring(id, name)
 	this.save_co2 = function(id, c)
 	{
 		request.get({
-			url: "http://49.212.141.20/Imager/co2.php",
+			url: "http://49.212.141.20/plant/api/record/update_co2",
 			qs: { sensor: id, co2: c }
 			},
 			function(err, res, body){ dump("co2="+body); }
@@ -51,7 +51,7 @@ function Measuring(id, name)
 	this.save_lux = function(id, l)
 	{
 		request.get({
-			url: "http://49.212.141.20/Imager/lux.php",
+			url: "http://49.212.141.20/plant/api/record/update_lux",
 			qs: { sensor: id, lux: l }
 			},
 			function(err, res, body){ dump("lux="+body); }
@@ -129,8 +129,8 @@ function Measuring(id, name)
 		var filename = getDateTimeString() + ".jpg";
 		print("uploading... filename=" + filename);
 		const form = new FormData();
-		form.append("userfile", bitmap, {filename: filename, contentType: "image/jpeg", /*knownLength: jpeg.length*/});
-		form.submit("http://49.212.141.20/Imager/upload/home", function(err,res)
+		form.append("image", bitmap, {filename: filename, contentType: "image/jpeg", /*knownLength: jpeg.length*/});
+		form.submit("http://49.212.141.20/plant/api/record/image", function(err,res)
 			{
 				console.log("code=" + res.statusCode + " body=" + res.statusMessage);
 			});
