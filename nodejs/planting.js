@@ -24,8 +24,8 @@ function Measuring(id, name)
 
 	this.calculate_lux_200 = function(v)
 	{
-		if(vol < 0.0) return 0;
-		var lux = 11167 * vol + 188;
+		if(v < 0.0) return 0;
+		var lux = 11167 * v + 188;
 		lux = Math.floor(lux / 100) * 100;
 		if(lux <= 0) lux = 1;
 		return lux;
