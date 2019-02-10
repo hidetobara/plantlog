@@ -94,7 +94,9 @@ function device_TEPT4400(obniz, num_top, num_vcc)
     var vol = get_median(_list);
     if(vol < 0.0) return 0;
     var lux = 7232.4 * vol + 2.5;
-    return Math.floor(lux / 100) * 100;
+	lux = Math.floor(lux / 100) * 100;
+	if(lux <= 0) lux = 1;
+	return lux;
   }
   this.clear = function(){ _list = []; }
 

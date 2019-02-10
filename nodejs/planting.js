@@ -24,8 +24,11 @@ function Measuring(id, name)
 
 	this.calculate_lux_200 = function(v)
 	{
-		if(v < 0.0) return 0;
-		return 11167 * v + 188;
+		if(vol < 0.0) return 0;
+		var lux = 11167 * vol + 188;
+		lux = Math.floor(lux / 100) * 100;
+		if(lux <= 0) lux = 1;
+		return lux;
 	}
 
 	this.save_temperature = function(id, t)
