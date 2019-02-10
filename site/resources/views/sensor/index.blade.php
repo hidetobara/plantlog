@@ -6,7 +6,7 @@
     <div class="row">
         @include('layouts.menu')
 
-        <div class="col-md-8 justify-content-center">
+        <div class="col-md-9 justify-content-center">
             <div class="card">
                 <div class="card-header">Sensors</div>
                 <div class="card-body">
@@ -25,7 +25,11 @@
                                 <td>{{$o->id}}</td>
                                 <td>{{$o->name}}</td>
                                 <td>{{$o->description}}</td>
-                                <td><a href="{{url('sensor/'.$o->id)}}">Chart</a></td>
+                                <td>
+                                    <a class="btn btn-info" href="{{url('sensor/chart/'.$o->id)}}">Chart</a>
+                                    <a class="btn btn-info" href="{{url('sensor/image/'.$o->id)}}">Images (every hour)</a>
+                                    <a class="btn btn-info" href="{{url('sensor/image/'.$o->id)}}?interval=24">Images (every day)</a>
+                                </td>
                             </tr>
                         @empty
                             No sensors.

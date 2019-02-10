@@ -6,7 +6,7 @@
     <div class="row">
         @include('layouts.menu')
 
-        <div class="col-md-8 justify-content-center">
+        <div class="col-md-9 justify-content-center">
             <div class="card">
                 <div class="card-header">Dashboard</div>
 

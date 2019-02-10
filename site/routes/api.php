@@ -23,3 +23,6 @@ Route::get('record/select_temperature', 'Api\RecordController@selectTemperature'
 Route::get('record/update_lux', 'Api\RecordController@updateLux');
 Route::get('record/select_lux', 'Api\RecordController@selectLux');
 Route::get('record/update_experiment', 'Api\RecordController@updateExperiment');
+Route::post('record/image', 'Api\RecordController@updateImage');
+Route::get('record/image/{id}/{time}', 'Api\RecordController@getImage');
+

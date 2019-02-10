@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use Exception;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 use App\Http\Controllers\Controller;
 use App\Models\Co2;
@@ -86,6 +87,47 @@ class RecordController extends Controller
         });
     }
 
+    public function updateImage(Request $request)
+    {
+        $s = MySession::factory();
+        try
+        {
+            if(!$request->file('image') || !$request->file('image')->isValid()) throw new Exception('Broken image.');
+            if(!$request->has('sensor_id')) throw new Exception("No sensor id.");
+
+            $extension = $request->file('image')->getClientOriginalExtension();
+            $now = Carbon::now();
+            $folder = sprintf("images/s%04d/%s", $request->input('sensor_id'), $now->format('ym'));
+            $filename = sprintf("%s.%s", $now->format('ymdH00'), $extension);
+
+            Storage::putFileAs($folder, $request->file('image'), $filename);
+            $s->add('filename', $filename);
+        }
+        catch(Exception $ex)
+        {
+            $s->addException($ex);
+        }
+        return response()->json($s->toApi());
+    }
+
+    public function getImage($id, $time, Request $request)
+    {
+        $s = MySession::factory();
+        try
+        {
+            $folder = substr($time, 0, 4);
+            $path = sprintf("images/s%04d/%s/%s", $id, $folder, $time);
+            if(!Storage::exists($path)) throw new Exception('Not exist the image.');
+            return Storage::download($path);
+        }
+        catch(Exception $ex)
+        {
+            $s->addException($ex);
+            return response()->json($s->toApi());
+        }
+    }
+
+    // Common process.
     private function updateRecord($func)
     {
         $s = MySession::factory();

@@ -20,4 +20,5 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 
 Route::get('/sensor', 'SensorController@index');
-Route::get('/sensor/{id}', 'SensorController@get');
+Route::get('/sensor/chart/{id}', 'SensorController@getChart');
+Route::get('/sensor/image/{id}', 'SensorController@getImage');
