@@ -14,7 +14,7 @@ class CreateExperimentsTable extends Migration
     public function up()
     {
         Schema::create('experiments', function (Blueprint $table) {
-            $table->increments('id');
+            $table->bigIncrements('id');
             $table->Integer('sensor_id');
             $table->datetime('time');
             $table->decimal('a', 6, 2);

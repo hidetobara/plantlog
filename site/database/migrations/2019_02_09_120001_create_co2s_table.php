@@ -14,7 +14,7 @@ class CreateCo2sTable extends Migration
     public function up()
     {
         Schema::create('co2s', function (Blueprint $table) {
-            $table->increments('id');
+            $table->bigIncrements('id');
             $table->integer('sensor_id');
             $table->datetime('time');
             $table->integer('co2');

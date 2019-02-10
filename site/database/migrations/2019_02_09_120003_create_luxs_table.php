@@ -14,7 +14,7 @@ class CreateLuxsTable extends Migration
     public function up()
     {
         Schema::create('luxs', function (Blueprint $table) {
-            $table->increments('id');
+            $table->bigIncrements('id');
             $table->integer('sensor_id');
             $table->datetime('time');
             $table->integer('lux');
