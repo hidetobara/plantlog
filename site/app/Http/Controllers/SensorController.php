@@ -34,7 +34,9 @@ class SensorController extends Controller
         $s = MySession::factory();
         try
         {
-            $s->add('obniz', Obniz::find($id));
+            $obniz = Obniz::find($id);
+            if(!$obniz) throw new Exception('No sensor.');
+            $s->add('obniz', $obniz);
         }
         catch(Exception $ex){ $s->addException($ex); }
         return view('sensor.chart', $s->toHtml());
