@@ -4,12 +4,9 @@
 
 <div class="container">
     <div class="row">
-        @include('layouts.menu')
         @include('layouts.chart_js')
 
         <div class="col-md-10">
-            @include('layouts.notice')
-
             <div style="width:95%;">
                 <canvas id="canvas_temperature"></canvas>
             </div>

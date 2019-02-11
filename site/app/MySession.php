@@ -22,7 +22,7 @@ class MySession
 
     private $data = [];
     private $messages = [];
-    private $errors = [];
+    private $warnings = [];
 
     public function load()
     {
@@ -44,15 +44,15 @@ class MySession
     public function addException(Exception $ex)
     {
         if(config('app.debug')) throw $ex;
-        $this->errors[] = $ex->getMessage();
+        $this->warnings[] = $ex->getMessage();
     }
 
     public function toApi()
     {
         $api = $this->data;
-        if(count($this->errors) > 0)
+        if(count($this->warnings) > 0)
         {
-            $api['errors'] = $this->errors;
+            $api['warnings'] = $this->warnings;
             $api['status'] = 'fail';
         }else{
             $api['status'] = 'ok';
@@ -62,8 +62,8 @@ class MySession
     public function toHtml()
     {
         $html = $this->data;
-        if(count($this->errors) > 0) $html['errors'] = $this->errors;
-        if(count($this->messages) > 0) $html['messages'] = $this->messages;
+        if(!empty($this->warnings)) $html['warnings'] = $this->warnings;
+        if(!empty($this->messages)) $html['messages'] = $this->messages;
         return $html;
     }
 }

@@ -11,22 +11,16 @@ use App\Models\Obniz;
 use App\MySession;
 
 
-class SensorController extends Controller
+class GuestController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
+        //$this->middleware('auth');
     }
 
     public function index()
     {
-        $s = MySession::factory();
-        try
-        {
-            $s->add('obnizs', Obniz::where(['user_id' => $s->getUserId()])->get());
-        }
-        catch(Exception $ex){ $s->addException($ex); }
-        return view('sensor.index', $s->toHtml());
+        return view('guest.index');
     }
 
     public function getChart($id, Request $request)
@@ -37,7 +31,7 @@ class SensorController extends Controller
             $s->add('obniz', Obniz::find($id));
         }
         catch(Exception $ex){ $s->addException($ex); }
-        return view('sensor.chart', $s->toHtml());
+        return view('guest.chart', $s->toHtml());
     }
 
     public function getImage($id, Request $request)
@@ -61,6 +55,6 @@ class SensorController extends Controller
             $s->add('paths', $paths);
         }
         catch(Exception $ex){ $s->addException($ex); }
-        return view('sensor.image', $s->toHtml());
+        return view('guest.image', $s->toHtml());
     }
 }

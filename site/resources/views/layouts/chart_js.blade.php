@@ -1,3 +1,11 @@
+<style>
+    canvas
+    {
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+    }
+</style>
 <script src="{{url('js/Chart.bundle.js')}}"></script>
 <script>
 function ChartController(option)

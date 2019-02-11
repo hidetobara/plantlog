@@ -6,7 +6,9 @@
     <div class="row">
         @include('layouts.menu')
 
-        <div class="col-md-9 justify-content-center">
+        <div class="col-md-9">
+            @include('layouts.notice')
+
             <div class="card">
                 <div class="card-header">Sensors</div>
                 <div class="card-body">
