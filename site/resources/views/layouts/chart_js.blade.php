@@ -81,7 +81,7 @@ function ChartController(option)
 		var data = [];
 		for(var i in values)
 		{
-			labels.push(i);
+			labels.push(i.substr(5)); // cut this year.
 			data.push(values[i]);
 		}
 		_config.data.labels = labels;
