@@ -132,6 +132,7 @@ function Measuring(id, name)
 		var filename = getDateTimeString() + ".jpg";
 		print("uploading... filename=" + filename);
 		const form = new FormData();
+		form.append("sensor_id", _id);
 		form.append("image", bitmap, {filename: filename, contentType: "image/jpeg", /*knownLength: jpeg.length*/});
 		form.submit("http://49.212.141.20/plant/api/record/image", function(err,res)
 			{
