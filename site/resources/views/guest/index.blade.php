@@ -29,6 +29,8 @@ $(temperature.initialize);
                     <div class="list-group list-group-flush">
                         <a href="{{url('guest/chart/1')}}" class="list-group-item">Charts in my room</a>
                         <a href="{{url('guest/image/1')}}" class="list-group-item">Images in my room</a>
+                        <a href="{{url('guest/image/2')}}" class="list-group-item">Images of orchid</a>
+                        <a href="{{url('guest/image/3')}}" class="list-group-item">Images of test</a>
                         <a href="{{url('guest/chart/3')}}" class="list-group-item">Charts in my corridor</a>
                     </div>
                 </div>

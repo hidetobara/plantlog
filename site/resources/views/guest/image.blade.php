@@ -6,6 +6,15 @@
     <div class="row">
         <div class="col-md-9 justify-content-center">
             <div class="card">
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <a href="{{url('guest/chart/'.$sensor_id)}}" class="list-group-item">Every hours</a>
+                        <a href="{{url('guest/image/'.$sensor_id)}}?interval=24" class="list-group-item">Everyday</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
                 <div class="card-header">Images</div>
                 <div class="card-body">
                 @forelse($paths as $path)
