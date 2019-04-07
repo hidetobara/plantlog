@@ -302,13 +302,25 @@ static void http_get_task(char* tag)
 
 static void http_post_task()
 {
-    esp_http_client_config_t config = {
-        .url = WEB_URL,
-    	.event_handler = http_event_handler
-    };
-    esp_http_client_handle_t client = esp_http_client_init(&config);
-
+	// ready for camera
+	esp_err_t err = camera_run();
+	if (err != ESP_OK) {
+		ESP_LOGD(TAG, "Camera capture failed with error = %d", err);
+		return;
+	}
 	size_t size = camera_get_data_size();
+	if(size == 0)
+	{
+		http_get_task("empty_image");
+		return;
+	}
+	
+	esp_http_client_config_t config = {
+		.url = WEB_URL,
+		.event_handler = http_event_handler
+	};
+	esp_http_client_handle_t client = esp_http_client_init(&config);
+
 	const char *boundary = "----WebKitFormBoundaryO5quBRiT4G7Vm3R7";
 	char head_type[80];
 	char head_length[32];
