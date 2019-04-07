@@ -92,8 +92,8 @@ class RecordController extends Controller
         $s = MySession::factory();
         try
         {
-            if(!$request->file('image') || !$request->file('image')->isValid()) throw new Exception('Broken image.');
             if(!$request->has('sensor_id')) throw new Exception("No sensor id.");
+            if(!$request->file('image') || !$request->file('image')->isValid()) throw new Exception('Broken image.');
 
             $extension = $request->file('image')->getClientOriginalExtension();
             $now = Carbon::now();
