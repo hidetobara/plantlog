@@ -57,4 +57,46 @@ class GuestController extends Controller
         catch(Exception $ex){ $s->addException($ex); }
         return view('guest.image', $s->toHtml());
     }
+
+    public function getChanging($id, Request $request)
+    {
+        $s = MySession::factory();
+        try
+        {
+            $s->add('sensor_id', $id);
+            $s->add('interval', $request->input('interval', 6));
+            $s->add('limit', $request->input('limit', 28));
+        }
+        catch(Exception $ex){ $s->addException($ex); }
+        return view('guest.changing', $s->toHtml());
+    }
+
+    public function getImagesJson($id, Request $request)
+    {
+        $s = MySession::factory();
+        try
+        {
+            $interval = $request->input('interval', 1);
+            if($interval < 1) $interval = 1;
+            $limit = $request->input('limit', 28);
+            $base = sprintf('images/s%04d/', $id);
+            $files = Storage::allFiles($base);
+            rsort($files);
+            $paths = [];
+            $names = [];
+            for($i = 0; $i < count($files); $i += $interval)
+            {
+                $info = pathinfo($files[$i]);
+                $paths[] = url('api/record/image/' . $id . '/' .$info['basename']);
+                $names[] = $info['basename'];
+                if(count($paths) >= $limit) break;
+            }
+            sort($paths);
+            sort($names);
+            $s->add('urls', $paths);
+            $s->add('names', $names);
+        }
+        catch(Exception $ex){ $s->addException($ex); }
+        return response()->json($s->toApi());
+    }
 }

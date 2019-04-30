@@ -16,6 +16,8 @@ Auth::routes();
 Route::get('/', 'GuestController@index');
 Route::get('/guest/chart/{id}', 'GuestController@getChart');
 Route::get('/guest/image/{id}', 'GuestController@getImage');
+Route::get('/guest/changing/{id}', 'GuestController@getChanging');
+Route::get('/guest/images/{id}.json', 'GuestController@getImagesJson');
 
 Route::get('/home', 'HomeController@index')->name('home');
 

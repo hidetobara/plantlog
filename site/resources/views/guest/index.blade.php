@@ -28,9 +28,9 @@ $(temperature.initialize);
                 <div class="card-body">
                     <div class="list-group list-group-flush">
                         <a href="{{url('guest/chart/1')}}" class="list-group-item">Charts in my room</a>
-                        <a href="{{url('guest/image/1')}}" class="list-group-item">Images in my room</a>
-                        <a href="{{url('guest/image/2')}}" class="list-group-item">Images of orchid</a>
-                        <a href="{{url('guest/image/3')}}" class="list-group-item">Images of test</a>
+                        <a href="{{url('guest/changing/1')}}" class="list-group-item">Images in my room</a>
+                        <a href="{{url('guest/changing/2')}}" class="list-group-item">Images of orchid 1</a>
+                        <a href="{{url('guest/changing/3')}}" class="list-group-item">Images of orchid 2</a>
                         <a href="{{url('guest/chart/3')}}" class="list-group-item">Charts in my corridor</a>
                     </div>
                 </div>
@@ -43,14 +43,14 @@ $(temperature.initialize);
                 <div class="card-body">
                     <div class="list-group list-group-flush">
                         <a href="{{url('guest/chart/1000')}}" class="list-group-item">Charts</a>
-                        <a href="{{url('guest/image/1000')}}" class="list-group-item">Images(Side-view)</a>
+                        <a href="{{url('guest/changing/1000')}}" class="list-group-item">Images(Side-view)</a>
                         <a href="{{url('guest/chart/1001')}}" class="list-group-item">Charts(Water)</a>
-                        <a href="{{url('guest/image/1001')}}" class="list-group-item">Images(Top-view)</a>
+                        <a href="{{url('guest/changing/1001')}}" class="list-group-item">Images(Top-view)</a>
                     </div>
                 </div>
             </div>
         </div>
-
+<!--
         <div class="col-md-4">
             <div class="card">
                 <div class="card-header">Satzz</div>
@@ -61,7 +61,7 @@ $(temperature.initialize);
                 </div>
             </div>
         </div>
-
+-->
     </div>
 </div>
 @endsection
