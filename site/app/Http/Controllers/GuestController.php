@@ -65,7 +65,7 @@ class GuestController extends Controller
         {
             $s->add('sensor_id', $id);
             $s->add('interval', $request->input('interval', 2));
-            $s->add('limit', $request->input('limit', 84));
+            $s->add('limit', $request->input('limit', 168));
         }
         catch(Exception $ex){ $s->addException($ex); }
         return view('guest.changing', $s->toHtml());
@@ -78,7 +78,7 @@ class GuestController extends Controller
         {
             $interval = $request->input('interval', 1);
             if($interval < 1) $interval = 1;
-            $limit = $request->input('limit', 28);
+            $limit = $request->input('limit', 24);
             $base = sprintf('images/s%04d/', $id);
             $files = Storage::allFiles($base);
             rsort($files);
