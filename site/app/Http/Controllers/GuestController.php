@@ -64,8 +64,8 @@ class GuestController extends Controller
         try
         {
             $s->add('sensor_id', $id);
-            $s->add('interval', $request->input('interval', 6));
-            $s->add('limit', $request->input('limit', 28));
+            $s->add('interval', $request->input('interval', 2));
+            $s->add('limit', $request->input('limit', 84));
         }
         catch(Exception $ex){ $s->addException($ex); }
         return view('guest.changing', $s->toHtml());
