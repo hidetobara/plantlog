@@ -35,7 +35,7 @@ function Controller()
         var img = $("#changing");
         img.fadeOut(1);
         img.attr("src", url);
-        img.fadeIn(1000);
+        img.fadeIn(500);
         $("#name").text(_names[_index]);
         _index += 1;
         if(_urls.length <= _index) _index = 0;
@@ -43,7 +43,7 @@ function Controller()
         var buf = $("#buffer");
         buf.attr("src", _urls[_index]);
     }
-    setInterval(loading, 5000);
+    setInterval(loading, 3000);
     return this;
 };
 instance = new Controller();
