@@ -8,8 +8,9 @@
             <div class="card">
                 <div class="card-body">
                     <div class="list-group list-group-flush">
-                        <a href="{{url('guest/chart/'.$sensor_id)}}" class="list-group-item">Every hours</a>
+                        <a href="{{url('guest/image/'.$sensor_id)}}" class="list-group-item">Every hours</a>
                         <a href="{{url('guest/image/'.$sensor_id)}}?interval=24" class="list-group-item">Everyday</a>
+                        <a href="{{url('guest/changing/'.$sensor_id)}}" class="list-group-item">Changing</a>
                     </div>
                 </div>
             </div>
