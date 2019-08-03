@@ -6,10 +6,8 @@
     <div class="row">
 
         <div class="col-md-12">
-            <div style="text-align:center;height:30vh;">
-                <p style="font-size:84px;">
-                    {{ config('app.name', 'Plantlog') }}
-                </p>
+            <div style="text-align:center;">
+                <img style="width:60%;" src="{{url('img/s1000.gif')}}" />
             </div>
 
             @include('layouts.chart_js')
