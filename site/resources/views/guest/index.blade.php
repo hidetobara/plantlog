@@ -43,7 +43,7 @@ $(temperature.initialize);
                         <a href="{{url('guest/chart/1000')}}" class="list-group-item">Charts</a>
                         <a href="{{url('guest/image/1000')}}" class="list-group-item">Images(Side-view)</a>
                         <a href="{{url('guest/chart/1001')}}" class="list-group-item">Charts(Water)</a>
-                        <a href="{{url('guest/image/1001')}}" class="list-group-item">Images(Top-view)</a>
+                        <a href="{{url('guest/image/1002')}}" class="list-group-item">Images(Top-view)</a>
                     </div>
                 </div>
             </div>
