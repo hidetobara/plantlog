@@ -43,8 +43,7 @@
 
 static void handle_jpg(http_context_t http_ctx, void* ctx);
 static esp_err_t event_handler(void *ctx, system_event_t *event);
-static void initialize_wifi(void);
-static void initialize_wifi_auto(void);
+static void initialize_wifi(bool is_static);
 static esp_err_t http_event_handler(esp_http_client_event_t *evt);
 static void http_get_task();
 static void http_post_task();
@@ -63,10 +62,10 @@ static camera_pixelformat_t s_pixel_format;
 //画像サイズを指定、QVGA、SVGAなど
 #define CAMERA_FRAME_SIZE CAMERA_FS_QVGA // CAMERA_FS_VGA,CAMERA_FS_QVGA
 
-#define WIFI_SSID          "tkji"
-#define WIFI_PASS          "dankogai"
-//#define WIFI_SSID          "HEROZ-LAN1"
-//#define WIFI_PASS          "herozheroz123"
+//#define WIFI_SSID          "tkji"
+//#define WIFI_PASS          "dankogai"
+#define WIFI_SSID          "plantlog"
+#define WIFI_PASS          "kogaidan"
 //#define WIFI_SSID          "aterm-723858-g"
 //#define WIFI_PASS          "kogaidan"
 //カメラのIPアドレスを指定
@@ -82,7 +81,7 @@ static camera_pixelformat_t s_pixel_format;
 
 #define PING_URL           "http://49.212.141.20/plant/api/record/ping?sensor_id=%d&tag=%s"
 #define WEB_URL            "http://49.212.141.20/plant/api/record/image"
-#define SENSOR_ID          1001 // home:0-9, heroz:10-19, tkji:1000,1001
+#define SENSOR_ID          12 // home:0-9, fixstars:10-19, tkji:1000,1001,1002
 
 #define TIMER_DIVIDER         16  //  Hardware timer clock divider
 #define TIMER_SCALE           (TIMER_BASE_CLK / TIMER_DIVIDER)  // convert counter value to seconds
@@ -160,8 +159,7 @@ void app_main()
         return;
     }
 
-    //initialize_wifi_auto();
-    initialize_wifi();
+    initialize_wifi(false);
 
     http_server_t server;
     http_server_options_t http_options = HTTP_SERVER_OPTIONS_DEFAULT();
@@ -221,18 +219,18 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
     return ESP_OK;
 }
 
-static void initialize_wifi(void)
+static void initialize_wifi(bool is_static)
 {
     tcpip_adapter_init();
-    tcpip_adapter_dhcpc_stop(TCPIP_ADAPTER_IF_STA); // Don't run a DHCP client
-    tcpip_adapter_ip_info_t ipInfo;
-
-    inet_pton(AF_INET, DEVICE_IP, &ipInfo.ip);
-    inet_pton(AF_INET, DEVICE_GW, &ipInfo.gw);
-    inet_pton(AF_INET, DEVICE_NETMASK, &ipInfo.netmask);
-
-    tcpip_adapter_set_ip_info(TCPIP_ADAPTER_IF_STA, &ipInfo);
-
+    if(is_static)
+    {
+        tcpip_adapter_dhcpc_stop(TCPIP_ADAPTER_IF_STA); // Don't run a DHCP client
+        tcpip_adapter_ip_info_t ipInfo;
+        inet_pton(AF_INET, DEVICE_IP, &ipInfo.ip);
+        inet_pton(AF_INET, DEVICE_GW, &ipInfo.gw);
+        inet_pton(AF_INET, DEVICE_NETMASK, &ipInfo.netmask);
+        tcpip_adapter_set_ip_info(TCPIP_ADAPTER_IF_STA, &ipInfo);
+    }
     s_wifi_event_group = xEventGroupCreate();
     ESP_ERROR_CHECK( esp_event_loop_init(event_handler, NULL) );
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
@@ -251,28 +249,6 @@ static void initialize_wifi(void)
     ESP_LOGI(TAG, "Connecting to \"%s\"", wifi_config.sta.ssid);
     xEventGroupWaitBits(s_wifi_event_group, CONNECTED_BIT, false, true, portMAX_DELAY);
     ESP_LOGI(TAG, "Connected");
-}
-
-static void initialize_wifi_auto(void)
-{
-	tcpip_adapter_init();
-	ESP_ERROR_CHECK(esp_event_loop_init(event_handler, NULL));
-
-	wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-	ESP_ERROR_CHECK(esp_wifi_init(&cfg));
-	wifi_config_t wifi_config = {
-		.sta = {
-			.ssid = WIFI_SSID,
-			.password = WIFI_PASS,
-			.scan_method = WIFI_ALL_CHANNEL_SCAN,
-			.sort_method = WIFI_CONNECT_AP_BY_SIGNAL,
-			.threshold.rssi = -127,
-			.threshold.authmode = WIFI_AUTH_OPEN,
-		},
-	};
-	ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
-	ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config));
-	ESP_ERROR_CHECK(esp_wifi_start());
 }
 
 static esp_err_t http_event_handler(esp_http_client_event_t *evt)

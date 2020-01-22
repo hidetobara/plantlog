@@ -21,7 +21,7 @@ function Controller()
 
     this.initialize = function()
     {
-        var url = "{{url('guest/images/'.$sensor_id.'.json')}}?interval={{$interval}}&limit={{$limit}}";
+        var url = "{{my_url('guest/images/'.$sensor_id.'.json')}}?interval={{$interval}}&limit={{$limit}}";
         $.getJSON(url, function(data){
             for(url of data.urls) _urls.push(url);
             for(name of data.names) _names.push(name);

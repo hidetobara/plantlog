@@ -8,9 +8,9 @@
             <div class="card">
                 <div class="card-body">
                     <div class="list-group list-group-flush">
-                        <a href="{{url('guest/image/'.$sensor_id)}}" class="list-group-item">Every hours</a>
-                        <a href="{{url('guest/image/'.$sensor_id)}}?interval=24" class="list-group-item">Everyday</a>
-                        <a href="{{url('guest/changing/'.$sensor_id)}}" class="list-group-item">Changing</a>
+                        <a href="{{my_url('guest/image/'.$sensor_id)}}" class="list-group-item">Every hours</a>
+                        <a href="{{my_url('guest/image/'.$sensor_id)}}?interval=24" class="list-group-item">Everyday</a>
+                        <a href="{{my_url('guest/changing/'.$sensor_id)}}" class="list-group-item">Changing</a>
                     </div>
                 </div>
             </div>
@@ -19,7 +19,7 @@
                 <div class="card-header">Images</div>
                 <div class="card-body">
                 @forelse($paths as $path)
-                    <img src="{{url('api/record/image/'.$path)}}" /> {{$path}} <br />
+                    <img src="{{my_url('api/record/image/'.$path)}}" /> {{$path}} <br />
                 @empty
                     No images.
                 @endforelse

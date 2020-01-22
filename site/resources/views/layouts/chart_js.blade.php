@@ -6,7 +6,7 @@
         -ms-user-select: none;
     }
 </style>
-<script src="{{url('js/Chart.bundle.js')}}"></script>
+<script src="{{my_url('js/Chart.bundle.js')}}"></script>
 <script>
 function ChartController(option)
 {

@@ -28,9 +28,9 @@
                                 <td>{{$o->name}}</td>
                                 <td>{{$o->description}}</td>
                                 <td>
-                                    <a class="btn btn-info" href="{{url('sensor/chart/'.$o->id)}}">Chart</a>
-                                    <a class="btn btn-info" href="{{url('sensor/image/'.$o->id)}}">Images (every hour)</a>
-                                    <a class="btn btn-info" href="{{url('sensor/image/'.$o->id)}}?interval=24">Images (every day)</a>
+                                    <a class="btn btn-info" href="{{my_url('sensor/chart/'.$o->id)}}">Chart</a>
+                                    <a class="btn btn-info" href="{{my_url('sensor/image/'.$o->id)}}">Images (every hour)</a>
+                                    <a class="btn btn-info" href="{{my_url('sensor/image/'.$o->id)}}?interval=24">Images (every day)</a>
                                 </td>
                             </tr>
                         @empty
