@@ -26,10 +26,11 @@ $(temperature.initialize);
                 <div class="card-body">
                     <div class="list-group list-group-flush">
                         <a href="{{my_url('guest/chart/1')}}" class="list-group-item">Charts in my room</a>
-                        <a href="{{my_url('guest/image/1')}}" class="list-group-item">Images in my room</a>
+                        <a href="{{my_url('guest/image/1')}}" class="list-group-item">Images with infrared camera</a>
                         <a href="{{my_url('guest/image/2')}}" class="list-group-item">Images of orchid 1</a>
-                        <a href="{{my_url('guest/image/3')}}" class="list-group-item">Images of orchid 2</a>
-                        <a href="{{my_url('guest/chart/3')}}" class="list-group-item">Charts in my corridor</a>
+                        <a href="{{my_url('guest/image/3')}}" class="list-group-item">Images of Corridor</a>
+                        <a href="{{my_url('guest/image/4')}}" class="list-group-item">Images of orchid 2</a>
+                        <a href="{{my_url('guest/chart/3')}}" class="list-group-item">Charts in my office</a>
                     </div>
                 </div>
             </div>
@@ -49,16 +50,6 @@ $(temperature.initialize);
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">Satzz</div>
-                <div class="card-body">
-                    <div class="list-group list-group-flush">
-                        <a href="{{my_url('guest/chart/1002')}}" class="list-group-item">Charts</a>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 @endsection
