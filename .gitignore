@@ -1,4 +1,4 @@
 nodejs/node_modules/
 
 .log
-.code-workspace
+*.code-workspace
