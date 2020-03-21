@@ -1,5 +1,5 @@
 ﻿
-FROM python:3.8
+FROM python:3.7
 
 RUN apt update -y && apt upgrade -y && \
 	apt -y install python3-pip vim curl supervisor less \
