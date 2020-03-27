@@ -12,6 +12,7 @@ use App\Models\Co2;
 use App\Models\Temperature;
 use App\Models\Lux;
 use App\Models\Experiment;
+use App\Models\Pressure;
 use App\MySession;
 
 
@@ -73,6 +74,24 @@ class RecordController extends Controller
             $sensor = $request->input('sensor');
             if(empty($sensor)) throw new Exception('Empty sensor id');
             return Lux::where(['sensor_id' => $sensor])->whereBetween('time', [$from, $to])->get();
+        });
+    }
+
+    public function updatePressure(Request $request)
+    {
+        return $this->updateRecord(function() use($request) {
+            $sensor = $request->input('sensor');
+            $pressure = $request->input('pressure');
+            if(empty($sensor) || empty($pressure)) throw new Exception('Empty sensor id or pressure');
+            Pressure::updateOrCreate(['sensor_id' => $sensor, 'time' => $this->getNow()], ['pressure' => $pressure]);
+        });
+    }
+    public function selectPressure(Request $request)
+    {
+        return $this->selectRecord($request, function($from,$to) use($request) {
+            $sensor = $request->input('sensor');
+            if(empty($sensor)) throw new Exception('Empty sensor id');
+            return Pressure::where(['sensor_id' => $sensor])->whereBetween('time', [$from, $to])->get();
         });
     }
 
@@ -160,7 +179,7 @@ class RecordController extends Controller
                 $times[$key] = $row->getValue();
             }
             $records = [];
-            for($t = clone($from); $t < $to; $t->modify("+{$interval} hour"))
+            for($t = clone($from); $t <= $to; $t->modify("+{$interval} hour"))
             {
                 $key = $t->format('Y-m-d H:00');
                 $value = isset($times[$key]) ? $times[$key]: null;
