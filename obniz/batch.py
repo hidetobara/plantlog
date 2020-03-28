@@ -287,17 +287,18 @@ def update_value(sensor, key, value):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--obniz_id', type=str, default=None, help='ID of obniz')
+    parser.add_argument('--pid', type=int, default=2, help='ID of plant')
     args = parser.parse_args()
 
-    if args.obniz_id and args.obniz_id is not None:
+    if args.obniz_id and args.obniz_id is not None and args.pid:
         d = ObnizWithDevice(obniz_id=args.obniz_id)
         d.set_tept4400().set_dht12().set_bmp280().run()
         print("temperature=", d.get_temperature())
         print("humidity=", d.get_humidity())
         print("pressure=", d.get_pressure())
         print("lux=", d.get_lux())
-        update_value(2, "temperature", d.get_temperature())
-        update_value(2, "lux", d.get_lux())
-        update_value(2, "pressure", d.get_pressure())
-        update_value(2, "humidity", d.get_humidity())
+        update_value(args.pid, "temperature", d.get_temperature())
+        update_value(args.pid, "lux", d.get_lux())
+        update_value(args.pid, "pressure", d.get_pressure())
+        update_value(args.pid, "humidity", d.get_humidity())
 
