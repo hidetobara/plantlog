@@ -24,6 +24,8 @@ Route::get('record/update_lux', 'Api\RecordController@updateLux');
 Route::get('record/select_lux', 'Api\RecordController@selectLux');
 Route::get('record/update_pressure', 'Api\RecordController@updatePressure');
 Route::get('record/select_pressure', 'Api\RecordController@selectPressure');
+Route::get('record/update_humidity', 'Api\RecordController@updateHumidity');
+Route::get('record/select_humidity', 'Api\RecordController@selectHumidity');
 Route::get('record/update_experiment', 'Api\RecordController@updateExperiment');
 Route::post('record/image', 'Api\RecordController@updateImage');
 Route::get('record/image/{id}/{time}', 'Api\RecordController@getImage');

@@ -13,6 +13,7 @@ use App\Models\Temperature;
 use App\Models\Lux;
 use App\Models\Experiment;
 use App\Models\Pressure;
+use App\Models\Humidity;
 use App\MySession;
 
 
@@ -27,9 +28,9 @@ class RecordController extends Controller
     {
         return $this->updateRecord(function() use($request) {
             $sensor = $request->input('sensor');
-            $co2 = $request->input('co2');
-            if(empty($sensor) || empty($co2)) throw new Exception('Empty sensor id or co2');
-            Co2::updateOrCreate(['sensor_id' => $sensor, 'time' => $this->getNow()], ['co2' => $co2]);
+            $value = $request->input('co2');
+            if(empty($sensor) || empty($value)) throw new Exception('Empty sensor id or co2');
+            Co2::updateOrCreate(['sensor_id' => $sensor, 'time' => $this->getNow()], ['co2' => $value]);
         });
     }
     public function selectCo2(Request $request)
@@ -45,9 +46,9 @@ class RecordController extends Controller
     {
         return $this->updateRecord(function() use($request) {
             $sensor = $request->input('sensor');
-            $temperature = $request->input('temperature');
-            if(empty($sensor) || empty($temperature)) throw new Exception('Empty sensor id or temperature');
-            Temperature::updateOrCreate(['sensor_id' => $sensor, 'time' => $this->getNow()], ['temperature' => $temperature]);
+            $value = $request->input('temperature');
+            if(empty($sensor) || empty($value)) throw new Exception('Empty sensor id or temperature');
+            Temperature::updateOrCreate(['sensor_id' => $sensor, 'time' => $this->getNow()], ['temperature' => $value]);
         });
     }
     public function selectTemperature(Request $request)
@@ -63,9 +64,9 @@ class RecordController extends Controller
     {
         return $this->updateRecord(function() use($request) {
             $sensor = $request->input('sensor');
-            $lux = $request->input('lux');
-            if(empty($sensor) || empty($lux)) throw new Exception('Empty sensor id or lux');
-            Lux::updateOrCreate(['sensor_id' => $sensor, 'time' => $this->getNow()], ['lux' => $lux]);
+            $value = $request->input('lux');
+            if(empty($sensor) || empty($value)) throw new Exception('Empty sensor id or lux');
+            Lux::updateOrCreate(['sensor_id' => $sensor, 'time' => $this->getNow()], ['lux' => $value]);
         });
     }
     public function selectLux(Request $request)
@@ -81,9 +82,9 @@ class RecordController extends Controller
     {
         return $this->updateRecord(function() use($request) {
             $sensor = $request->input('sensor');
-            $pressure = $request->input('pressure');
-            if(empty($sensor) || empty($pressure)) throw new Exception('Empty sensor id or pressure');
-            Pressure::updateOrCreate(['sensor_id' => $sensor, 'time' => $this->getNow()], ['pressure' => $pressure]);
+            $value = $request->input('pressure');
+            if(empty($sensor) || empty($value)) throw new Exception('Empty sensor id or pressure');
+            Pressure::updateOrCreate(['sensor_id' => $sensor, 'time' => $this->getNow()], ['pressure' => $value]);
         });
     }
     public function selectPressure(Request $request)
@@ -92,6 +93,24 @@ class RecordController extends Controller
             $sensor = $request->input('sensor');
             if(empty($sensor)) throw new Exception('Empty sensor id');
             return Pressure::where(['sensor_id' => $sensor])->whereBetween('time', [$from, $to])->get();
+        });
+    }
+
+    public function updateHumidity(Request $request)
+    {
+        return $this->updateRecord(function() use($request) {
+            $sensor = $request->input('sensor');
+            $value = $request->input('humidity');
+            if(empty($sensor) || empty($value)) throw new Exception('Empty sensor id or humidity');
+            Humidity::updateOrCreate(['sensor_id' => $sensor, 'time' => $this->getNow()], ['humidity' => $value]);
+        });
+    }
+    public function selectHumidity(Request $request)
+    {
+        return $this->selectRecord($request, function($from,$to) use($request) {
+            $sensor = $request->input('sensor');
+            if(empty($sensor)) throw new Exception('Empty sensor id');
+            return Humidity::where(['sensor_id' => $sensor])->whereBetween('time', [$from, $to])->get();
         });
     }
 
