@@ -1,16 +1,18 @@
 import os,sys,string,traceback,random,glob,json,datetime,argparse,math
 import asyncio
+import urllib.request
 from obniz import Obniz
 
 
-class DeviceWithObniz:
+class ObnizWithDevice:
     """
     Obnizを使ったデバイス制御
     """
 
-    def __init__(self, obid='0167-3051'):
-        self.obniz = Obniz(obid)
+    def __init__(self, obniz_id):
+        self.obniz = Obniz(obniz_id)
         self.data = {}
+        self.events = []
 
     def store(self, name, value):
         if name not in self.data:
@@ -26,15 +28,17 @@ class DeviceWithObniz:
     def get_humidity(self):
         return self.calculate_median("humidity")
     def get_temperature(self):
-        return self.calculate_median("temperature")
+        t = self.calculate_median("temperature")
+        return t if t is not None else self.calculate_median("temperature_")
+
     def get_lux(self):
         return self.calculate_median("lux")
-    def get_atmosphere(self):
-        return self.calculate_median("atmosphere")
+    def get_pressure(self):
+        return self.calculate_median("pressure")
 
-    def run_power(self, obniz, gnd, vdd):
+    def run_power(self, obniz, gnd, vdd, voltage="3v"):
         if vdd is not None:
-            obniz.__dict__['io{}'.format(vdd)].pull("3v")
+            obniz.__dict__['io{}'.format(vdd)].pull(voltage)
             obniz.__dict__['io{}'.format(vdd)].output(True)
         if gnd is not None:
             obniz.__dict__['io{}'.format(gnd)].output(False)
@@ -46,7 +50,7 @@ class DeviceWithObniz:
             return math.floor(lux / 100) * 100
 
         async def on_tept4400(obniz):
-            self.run_power(gnd, vdd)
+            self.run_power(obniz, gnd, vdd, "5v")
             land = obniz.__dict__['ad{}'.format(ad)]
             land.start()
             drain = obniz.__dict__['ad{}'.format(vdd)]
@@ -56,9 +60,8 @@ class DeviceWithObniz:
                 print("tept4400>", land.value, drain.value)
                 self.store("lux", calculate_lux(drain.value - land.value))
                 await obniz.wait(1000)
-            obniz.close()
-            asyncio.get_event_loop().stop()
-        self.obniz.onconnect = on_tept4400
+
+        self.events.append(on_tept4400)
         return self
 
     def set_dht12(self, sda=7, scl=9, gnd=11, vdd=5):
@@ -73,13 +76,13 @@ class DeviceWithObniz:
                 i2c.write(ADR, [0x00])
                 r = await i2c.read_wait(ADR, 5)
                 chk = (r[0] + r[1] + r[2] + r[3]) & 0xff
-                print("dht>", r, chk)
+                print("dht>", r)
                 if chk != r[4]: continue
                 self.store("humidity", r[0] + r[1]*0.1)
                 self.store("temperature", r[2] + r[3]*0.1)
                 await obniz.wait(1000)
-            asyncio.get_event_loop().stop()
-        self.obniz.onconnect = on_dht12
+
+        self.events.append(on_dht12)
         return self
 
     def set_tsl2561(self, sda=1, scl=0, gnd=2, vdd=3):
@@ -123,8 +126,8 @@ class DeviceWithObniz:
                 print("tsl2561>", ch0, ch1)
                 self.store("lux", calculate_lux(ch0, ch1))
                 await obniz.wait(1000)
-            asyncio.get_event_loop().stop()
-        self.obniz.onconnect = on_tsl2561
+        
+        self.events.append(on_tsl2561)
         return self
 
     def set_bmp280(self, sda=7, scl=9, gnd=11, vdd=5):
@@ -178,7 +181,7 @@ class DeviceWithObniz:
                 val_2 = ((self.cal_P8) * p) >> 19
 
                 p = ((p + val_1 + val_2) >> 8) + ((self.cal_P7)<<4)
-                return (p/256.0) / 100.0
+                return p/256.0
 
             async def get_value_alti(self):
                 seaLevelhPa = 1013.25
@@ -224,7 +227,7 @@ class DeviceWithObniz:
                 await asyncio.sleep(0.1)
                 self.i2c.write(ADR, [0xD0])
                 data = await self.i2c.read_wait(ADR, 1)
-                print("ID=", data)
+                #print("ID=", data)
                 self.i2c.write(ADR, [0xF4, 0x6F])
                 self.cal_T1 = await self.get_value16(0x88)
                 self.cal_T2 = await self.get_value16s(0x8A)
@@ -250,31 +253,51 @@ class DeviceWithObniz:
             for _ in range(0, 10):
                 t = await d.get_value_temp()
                 p = await d.get_value_pres()
-                self.store("temperature", t)
-                self.store("atmosphere", p)
+                self.store("temperature_", t) # ignore
+                self.store("pressure", p)
                 print("bmp280>", t, p)
                 await obniz.wait(1000)
-            asyncio.get_event_loop().stop()
-        self.obniz.onconnect = on_bmp280
+            
+        self.events.append(on_bmp280)
         return self
 
     def run(self):
         try:
+            async def on_events(obniz):
+                for handler in self.events:
+                    await handler(obniz)
+                asyncio.get_event_loop().stop()
+            self.obniz.onconnect = on_events
             asyncio.get_event_loop().run_forever()
         except Exception as ex:
             print('ERROR=', ex)
             asyncio.get_event_loop().stop()
+        finally:
+            self.obniz.close()
 
-            
+def update_value(sensor, key, value):
+    try:
+        url = 'http://49.212.141.20/plant/api/record/update_{}?sensor={}&{}={}'.format(key, sensor, key, value)
+        req = urllib.request.Request(url)
+        with urllib.request.urlopen(req) as res:
+            print("OK=", key, res.read())
+    except Exception as ex:
+        print("ERROR=", url, ex)
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--on', action='store_true')
+    parser.add_argument('--obniz_id', type=str, default=None, help='ID of obniz')
     args = parser.parse_args()
 
-    d = DeviceWithObniz()
-    if args.on:
-        d.set_bmp280().run()
+    if args.obniz_id and args.obniz_id is not None:
+        d = ObnizWithDevice(obniz_id=args.obniz_id)
+        d.set_tept4400().set_dht12().set_bmp280().run()
         print("temperature=", d.get_temperature())
         print("humidity=", d.get_humidity())
-        print("atmosphere", d.get_atmosphere())
-        #print("lux=", d.get_lux())
+        print("pressure=", d.get_pressure())
+        print("lux=", d.get_lux())
+        update_value(2, "temperature", d.get_temperature())
+        update_value(2, "lux", d.get_lux())
+        update_value(2, "pressure", d.get_pressure())
+        update_value(2, "humidity", d.get_humidity())
+
