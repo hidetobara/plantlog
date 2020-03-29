@@ -1,4 +1,4 @@
-import os,sys,string,traceback,random,glob,json,datetime,argparse,math
+import os,sys,string,traceback,random,glob,json,datetime,argparse,math,time
 import asyncio
 import urllib.request
 from obniz import Obniz
@@ -10,6 +10,7 @@ class ObnizWithDevice:
     """
 
     def __init__(self, obniz_id):
+        print("obniz>", obniz_id)
         self.obniz = Obniz(obniz_id)
         self.data = {}
         self.events = []
@@ -38,10 +39,17 @@ class ObnizWithDevice:
 
     def run_power(self, obniz, gnd, vdd, voltage="3v"):
         if vdd is not None:
-            obniz.__dict__['io{}'.format(vdd)].pull(voltage)
-            obniz.__dict__['io{}'.format(vdd)].output(True)
+            obniz.get_io(vdd).pull(voltage)
+            obniz.get_io(vdd).output(True)
         if gnd is not None:
-            obniz.__dict__['io{}'.format(gnd)].output(False)
+            obniz.get_io(gnd).output(False)
+        print("power>", gnd, vdd, voltage)
+
+    def stop_power(self, obniz, gnd, vdd):
+        if vdd is not None:
+            obniz.get_io(vdd).end()
+        if gnd is not None:
+            obniz.get_io(gnd).end()
 
     def set_tept4400(self, ad=1, gnd=0, vdd=2):
         def calculate_lux(vol):
@@ -64,13 +72,22 @@ class ObnizWithDevice:
         self.events.append(on_tept4400)
         return self
 
+    def set_5v(self, gnd=None, vdd=5, seconds=3):
+        async def on_5v(obniz):
+            self.run_power(obniz, gnd, vdd, "5v")
+            await obniz.wait(seconds * 1000)
+            self.stop_power(obniz, gnd, vdd)
+            await obniz.wait(1000)
+        self.events.append(on_5v)
+        return self
+
     def set_dht12(self, sda=7, scl=9, gnd=11, vdd=5):
         ADR = 0x5c
         async def on_dht12(obniz):
             self.run_power(obniz, gnd, vdd)
             await obniz.wait(3000)
             i2c = obniz.i2c0
-            i2c.start( {"mode":"master", "sda":sda, "scl":scl, "clock":100000, "pull":"5v"} )
+            i2c.start( {"mode":"master", "sda":sda, "scl":scl, "clock":100000, "pull":None} )
             i2c.onerror = lambda e: print("dht12", e)
             for _ in range(0, 10):
                 i2c.write(ADR, [0x00])
@@ -112,7 +129,7 @@ class ObnizWithDevice:
             self.run_power(obniz, gnd, vdd)
             await obniz.wait(3000)
             i2c = obniz.i2c0
-            i2c.start( {"mode":"master", "sda":sda, "scl":scl, "clock":100000, "pull":"5v"} )
+            i2c.start( {"mode":"master", "sda":sda, "scl":scl, "clock":100000, "pull":"3v"} )
             i2c.onerror = lambda e: print("tsl2561", e)
             i2c.write(ADR, [0x80, 0x03])
             i2c.write(ADR, [0x81, GAIN])
@@ -268,7 +285,7 @@ class ObnizWithDevice:
                     await handler(obniz)
                 asyncio.get_event_loop().stop()
             self.obniz.onconnect = on_events
-            asyncio.get_event_loop().run_forever()
+            asyncio.get_event_loop().run_until_complete(sleeping(60))
         except Exception as ex:
             print('ERROR=', ex)
             asyncio.get_event_loop().stop()
@@ -277,6 +294,7 @@ class ObnizWithDevice:
 
 def update_value(sensor, key, value):
     try:
+        if value is None: return
         url = 'http://49.212.141.20/plant/api/record/update_{}?sensor={}&{}={}'.format(key, sensor, key, value)
         req = urllib.request.Request(url)
         with urllib.request.urlopen(req) as res:
@@ -284,15 +302,24 @@ def update_value(sensor, key, value):
     except Exception as ex:
         print("ERROR=", url, ex)
 
+async def sleeping(sec):
+    loop = asyncio.get_event_loop()
+    await loop.run_in_executor(None, time.sleep, sec)
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--obniz_id', type=str, default=None, help='ID of obniz')
-    parser.add_argument('--pid', type=int, default=2, help='ID of plant')
+    parser.add_argument('--obniz_id', type=str, required=True, help='ID of obniz')
+    parser.add_argument('--pid', type=int, required=True, help='ID of plant')
+    parser.add_argument('--water', action='store_true')
+    parser.add_argument('--sensing', action='store_true')
     args = parser.parse_args()
 
-    if args.obniz_id and args.obniz_id is not None and args.pid:
+    if args.sensing:
         d = ObnizWithDevice(obniz_id=args.obniz_id)
-        d.set_tept4400().set_dht12().set_bmp280().run()
+        d.set_tept4400(ad=0, gnd=None, vdd=1) \
+            .set_dht12(sda=3, scl=4, gnd=None, vdd=2) \
+            .set_bmp280(sda=3, scl=4, gnd=None, vdd=2) \
+            .run()
         print("temperature=", d.get_temperature())
         print("humidity=", d.get_humidity())
         print("pressure=", d.get_pressure())
@@ -301,4 +328,7 @@ if __name__ == "__main__":
         update_value(args.pid, "lux", d.get_lux())
         update_value(args.pid, "pressure", d.get_pressure())
         update_value(args.pid, "humidity", d.get_humidity())
+    if args.water:
+        d = ObnizWithDevice(obniz_id=args.obniz_id)
+        d.set_5v(gnd=None, vdd=5, seconds=10).run()
 
