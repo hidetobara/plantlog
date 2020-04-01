@@ -6,7 +6,7 @@
     <div class="row">
         @include('layouts.chart_js')
 
-        <div class="col-md-10">
+        <div class="col-md-6">
             <div style="width:95%;">
                 <canvas id="canvas_temperature"></canvas>
             </div>
@@ -16,6 +16,8 @@
             <div style="width:95%;">
                 <canvas id="canvas_lux"></canvas>
             </div>
+        </div>
+        <div class="col-md-6">
             <div style="width:95%;">
                 <canvas id="canvas_humidity"></canvas>
             </div>
@@ -25,6 +27,7 @@
             <div style="width:95%;">
                 <canvas id="canvas_co2"></canvas>
             </div>
+        </div>
 <script>
 <?php
 $last_momth = Carbon\Carbon::today()->startOfMonth()->addMonth(-1)->format("Y-m-d H:i");

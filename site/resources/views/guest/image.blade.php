@@ -4,17 +4,7 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-md-9 justify-content-center">
-            <div class="card">
-                <div class="card-body">
-                    <div class="list-group list-group-flush">
-                        <a href="{{my_url('guest/image/'.$sensor_id)}}" class="list-group-item">Every hours</a>
-                        <a href="{{my_url('guest/image/'.$sensor_id)}}?interval=24" class="list-group-item">Everyday</a>
-                        <a href="{{my_url('guest/changing/'.$sensor_id)}}" class="list-group-item">Changing</a>
-                    </div>
-                </div>
-            </div>
-
+        <div class="col-md-12 justify-content-center">
             <div class="card">
                 <div class="card-header">Images</div>
                 <div class="card-body">

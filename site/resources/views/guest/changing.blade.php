@@ -4,7 +4,7 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-md-12 justify-content-center" align="center">
+        <div class="col-md-12 justify-content-center" style="text-align:center;">
             <img width="90%" id="changing">
             <img width="1" id="buffer">
             <b id="name"></b>

@@ -71,6 +71,17 @@ class GuestController extends Controller
         return view('guest.changing', $s->toHtml());
     }
 
+    public function getRecent($id, Request $request)
+    {
+        $s = MySession::factory();
+        try
+        {
+            $s->add('sensor_id', $id);
+        }
+        catch(Exception $ex){ $s->addException($ex); }
+        return view('guest.recent', $s->toHtml());
+    }
+
     public function getImagesJson($id, Request $request)
     {
         $s = MySession::factory();
