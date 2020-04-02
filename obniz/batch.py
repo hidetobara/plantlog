@@ -31,11 +31,12 @@ class ObnizWithDevice:
     def get_temperature(self):
         t = self.calculate_median("temperature")
         return t if t is not None else self.calculate_median("temperature_")
-
     def get_lux(self):
         return self.calculate_median("lux")
     def get_pressure(self):
         return self.calculate_median("pressure")
+    def get_co2(self):
+        return self.calculate_median("co2")
 
     def run_power(self, obniz, gnd, vdd, voltage="3v"):
         if vdd is not None:
@@ -100,6 +101,38 @@ class ObnizWithDevice:
                 await obniz.wait(1000)
 
         self.events.append(on_dht12)
+        return self
+
+    def set_ccs811(self, sda=10, scl=11):
+        """
+        need VDD 1.8-3.6V
+        """
+        ADR = 0x5B
+        async def on_ccs811(obniz):
+            i2c = obniz.i2c0
+            i2c.start( {"mode":"master", "sda":sda, "scl":scl, "clock":100000, "pull":"3v"} )
+            i2c.onerror = lambda e: print("ccs811", e)
+            #i2c.write(ADR, [0x20])
+            #r = await i2c.read_wait(ADR, 1)
+            #print("HW=", r)
+            #i2c.write(ADR, [0xFF, 0x11, 0xE5, 0x72, 0x8A])  # reset
+            i2c.write(ADR, [0xF4])  # app start
+            i2c.write(ADR, [0x01, 0x10])  # every 1sec
+            await obniz.wait(3000)
+            for _ in range(0, 10):
+                await obniz.wait(1000)
+                i2c.write(ADR, [0x02])
+                r = await i2c.read_wait(ADR, 8)
+                print("ccs811>", r)
+                if r[4] != 144: continue
+                eco2 = r[0] << 8 | r[1]
+                tvoc = r[2] << 8 | r[3]
+                if eco2 == 0: continue
+                self.store("co2", eco2)
+                self.store("tvoc", tvoc)
+            i2c.write(ADR, [0x01, 0x00])  # sleep
+            await obniz.wait(1)
+        self.events.append(on_ccs811)
         return self
 
     def set_tsl2561(self, sda=1, scl=0, gnd=2, vdd=3):
@@ -283,6 +316,7 @@ class ObnizWithDevice:
             async def on_events(obniz):
                 for handler in self.events:
                     await handler(obniz)
+                print("ending...")
                 asyncio.get_event_loop().stop()
             self.obniz.onconnect = on_events
             asyncio.get_event_loop().run_until_complete(sleeping(60))
@@ -312,7 +346,14 @@ if __name__ == "__main__":
     parser.add_argument('--pid', type=int, required=True, help='ID of plant')
     parser.add_argument('--water', action='store_true')
     parser.add_argument('--sensing', action='store_true')
+    parser.add_argument('--hoge', action='store_true')
     args = parser.parse_args()
+
+    if args.hoge:
+        d = ObnizWithDevice(obniz_id=args.obniz_id)
+        d.set_ccs811().run()
+        print("co2=", d.get_co2())
+        update_value(args.pid, "co2", d.get_co2())
 
     if args.sensing:
         d = ObnizWithDevice(obniz_id=args.obniz_id)
@@ -328,6 +369,7 @@ if __name__ == "__main__":
         update_value(args.pid, "lux", d.get_lux())
         update_value(args.pid, "pressure", d.get_pressure())
         update_value(args.pid, "humidity", d.get_humidity())
+
     if args.water:
         d = ObnizWithDevice(obniz_id=args.obniz_id)
         d.set_5v(gnd=None, vdd=5, seconds=10).run()
