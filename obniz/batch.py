@@ -6,7 +6,7 @@ from obniz import Obniz
 
 class ObnizWithDevice:
     """
-    Obnizを使ったデバイス制御
+    Handle devices using Obniz
     """
 
     def __init__(self, obniz_id):
@@ -54,9 +54,9 @@ class ObnizWithDevice:
 
     def set_tept4400(self, ad=1, gnd=0, vdd=2):
         def calculate_lux(vol):
-            if vol < 0.0: return 0
             lux = 7232.4 * vol + 2.5
-            return math.floor(lux / 100) * 100
+            value = math.floor(lux / 100) * 100
+            return value if value > 1 else 1
 
         async def on_tept4400(obniz):
             self.run_power(obniz, gnd, vdd, "5v")
@@ -115,7 +115,6 @@ class ObnizWithDevice:
             #i2c.write(ADR, [0x20])
             #r = await i2c.read_wait(ADR, 1)
             #print("HW=", r)
-            #i2c.write(ADR, [0xFF, 0x11, 0xE5, 0x72, 0x8A])  # reset
             i2c.write(ADR, [0xF4])  # app start
             i2c.write(ADR, [0x01, 0x10])  # every 1sec
             await obniz.wait(3000)
@@ -124,12 +123,18 @@ class ObnizWithDevice:
                 i2c.write(ADR, [0x02])
                 r = await i2c.read_wait(ADR, 8)
                 print("ccs811>", r)
-                if r[4] != 144: continue
-                eco2 = r[0] << 8 | r[1]
-                tvoc = r[2] << 8 | r[3]
-                if eco2 == 0: continue
-                self.store("co2", eco2)
-                self.store("tvoc", tvoc)
+                if r[4] == 153:
+                    continue
+                if r[4] == 144:
+                    eco2 = r[0] << 8 | r[1]
+                    tvoc = r[2] << 8 | r[3]
+                    if eco2 == 0: continue
+                    self.store("co2", eco2)
+                    self.store("tvoc", tvoc)
+                if r[4] & 0b1 == 1:
+                    i2c.write(ADR, [0xFF, 0x11, 0xE5, 0x72, 0x8A])  # reset
+                    print("ccs811>", "reset")
+                    break
             i2c.write(ADR, [0x01, 0x00])  # sleep
             await obniz.wait(1)
         self.events.append(on_ccs811)
