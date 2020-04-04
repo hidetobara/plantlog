@@ -132,6 +132,9 @@ class ObnizWithDevice:
                     self.store("co2", eco2)
                     self.store("tvoc", tvoc)
                 if r[4] & 0b1 == 1:
+                    i2c.write(ADR, [0xE0])
+                    r = await i2c.read_wait(ADR, 1)
+                    self.store("co2", r[0]) # not good...
                     i2c.write(ADR, [0xFF, 0x11, 0xE5, 0x72, 0x8A])  # reset
                     print("ccs811>", "reset")
                     break
