@@ -15,6 +15,8 @@ class ObnizWithDevice:
         self.data = {}
         self.events = []
 
+    def clear(self, name):
+        self.data[name] = []
     def store(self, name, value):
         if name not in self.data:
             self.data[name] = []
@@ -118,15 +120,13 @@ class ObnizWithDevice:
             #print("HW=", r)
             i2c.write(ADR, [0xF4])  # app start
             i2c.write(ADR, [0x01, 0x10])  # every 1sec
-            await obniz.wait(3000)
+            await obniz.wait(5000)
             for _ in range(0, 10):
                 await obniz.wait(1000)
                 i2c.write(ADR, [0x02])
                 r = await i2c.read_wait(ADR, 8)
                 print("ccs811>", r)
-                if r[4] == 152 or r[4] == 153:
-                    continue
-                if r[4] == 144:
+                if r[4] >> 7 & 0b1 == 1:
                     eco2 = r[0] << 8 | r[1]
                     tvoc = r[2] << 8 | r[3]
                     if eco2 == 0: continue
@@ -135,6 +135,7 @@ class ObnizWithDevice:
                 if r[4] & 0b1 == 1:
                     i2c.write(ADR, [0xE0])
                     r = await i2c.read_wait(ADR, 1)
+                    self.clear("co2")
                     self.store("co2", r[0]) # not good...
                     i2c.write(ADR, [0xFF, 0x11, 0xE5, 0x72, 0x8A])  # reset
                     print("ccs811>", "reset")
