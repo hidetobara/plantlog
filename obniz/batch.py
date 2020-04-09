@@ -108,6 +108,7 @@ class ObnizWithDevice:
         need VDD 1.8-3.6V
         """
         ADR = 0x5B
+        #ADR = 0x5A
         async def on_ccs811(obniz):
             i2c = obniz.i2c0
             i2c.start( {"mode":"master", "sda":sda, "scl":scl, "clock":100000, "pull":"3v"} )
@@ -123,7 +124,7 @@ class ObnizWithDevice:
                 i2c.write(ADR, [0x02])
                 r = await i2c.read_wait(ADR, 8)
                 print("ccs811>", r)
-                if r[4] == 153:
+                if r[4] == 152 or r[4] == 153:
                     continue
                 if r[4] == 144:
                     eco2 = r[0] << 8 | r[1]
@@ -138,7 +139,7 @@ class ObnizWithDevice:
                     i2c.write(ADR, [0xFF, 0x11, 0xE5, 0x72, 0x8A])  # reset
                     print("ccs811>", "reset")
                     break
-            i2c.write(ADR, [0x01, 0x00])  # sleep
+            #i2c.write(ADR, [0x01, 0x00])  # sleep
             await obniz.wait(1)
         self.events.append(on_ccs811)
         return self
