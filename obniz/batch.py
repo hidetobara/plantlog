@@ -105,6 +105,7 @@ class ObnizWithDevice:
         self.events.append(on_dht12)
         return self
 
+    # Do not work
     def set_ccs811(self, sda=10, scl=11):
         """
         need VDD 1.8-3.6V
@@ -321,6 +322,36 @@ class ObnizWithDevice:
         self.events.append(on_bmp280)
         return self
 
+    # Do not work
+    def set_LM35DZ(self, gnd=0, output=1, vcc=2):
+        async def on_LM35DZ(obniz):
+            d = obniz.wired("LM35DZ", {"gnd":gnd ,"output":output, "vcc":vcc}) # not implmented
+            for _ in range(0, 10):
+                temperature = await d.getWait()
+                self.store("temperature", temperature)
+                await obniz.wait(1000)
+
+        self.events.append(on_LM35DZ)
+        return self
+
+    def set_MHZ19B(self, tx=3, rx=4):
+        async def on_MHZ19B(obniz):
+            d = obniz.get_free_uart()
+            d.start({"tx": tx, "rx": rx, "baud":9600, "bits":8, "stop":1, "parity":"off", "flowcontrol":"off"})
+            d.send([0xFF, 0x01, 0x79, 0xA0, 0x00, 0x00, 0x00, 0x00, 0xE6])
+            for _ in range(0, 10):
+                command = [0xFF, 0x01, 0x86, 0x00, 0x00, 0x00, 0x00, 0x00, 0x79]
+                d.send(command)
+                await obniz.wait(1000)
+                res = d.read_bytes()
+                print(res)
+                if len(res) != 9: continue
+                if res[1] != 134: continue
+                self.store("co2", res[2] * 256 + res[3])
+
+        self.events.append(on_MHZ19B)
+        return self
+
     def run(self):
         try:
             async def on_events(obniz):
@@ -359,28 +390,28 @@ if __name__ == "__main__":
     parser.add_argument('--hoge', action='store_true')
     args = parser.parse_args()
 
-    if args.hoge:
-        d = ObnizWithDevice(obniz_id=args.obniz_id)
-        d.set_ccs811().run()
-        print("co2=", d.get_co2())
-        update_value(args.pid, "co2", d.get_co2())
+    if args.pid == 2:
+        if args.sensing:
+            d = ObnizWithDevice(obniz_id=args.obniz_id)
+            d.set_tept4400(ad=0, gnd=None, vdd=1) \
+                .set_dht12(sda=3, scl=4, gnd=None, vdd=2) \
+                .set_bmp280(sda=3, scl=4, gnd=None, vdd=2) \
+                .run()
+            print("temperature=", d.get_temperature())
+            print("humidity=", d.get_humidity())
+            print("pressure=", d.get_pressure())
+            print("lux=", d.get_lux())
+            update_value(args.pid, "temperature", d.get_temperature())
+            update_value(args.pid, "lux", d.get_lux())
+            update_value(args.pid, "pressure", d.get_pressure())
+            update_value(args.pid, "humidity", d.get_humidity())
 
-    if args.sensing:
+        if args.water:
+            d = ObnizWithDevice(obniz_id=args.obniz_id)
+            d.set_5v(gnd=None, vdd=5, seconds=10).run()
+    if args.pid == 1:
         d = ObnizWithDevice(obniz_id=args.obniz_id)
-        d.set_tept4400(ad=0, gnd=None, vdd=1) \
-            .set_dht12(sda=3, scl=4, gnd=None, vdd=2) \
-            .set_bmp280(sda=3, scl=4, gnd=None, vdd=2) \
-            .run()
+        d.set_MHZ19B().run()
         print("temperature=", d.get_temperature())
-        print("humidity=", d.get_humidity())
-        print("pressure=", d.get_pressure())
-        print("lux=", d.get_lux())
-        update_value(args.pid, "temperature", d.get_temperature())
-        update_value(args.pid, "lux", d.get_lux())
-        update_value(args.pid, "pressure", d.get_pressure())
-        update_value(args.pid, "humidity", d.get_humidity())
-
-    if args.water:
-        d = ObnizWithDevice(obniz_id=args.obniz_id)
-        d.set_5v(gnd=None, vdd=5, seconds=10).run()
+        print("co2=", d.get_co2())
 
