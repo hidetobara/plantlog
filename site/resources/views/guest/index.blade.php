@@ -25,11 +25,11 @@ $(temperature.initialize);
                 <div class="card-header">Home</div>
                 <div class="card-body">
                     <div class="list-group list-group-flush">
-                        <a href="{{my_url('guest/chart/1')}}" class="list-group-item">Charts in my room</a>
+                        <a href="{{my_url('guest/chart/1')}}" class="list-group-item">Charts in my room 1</a>
+                        <a href="{{my_url('guest/chart/2')}}" class="list-group-item">Charts in my room 2</a>
                         <a href="{{my_url('guest/recent/1')}}" class="list-group-item">Images with infrared camera</a>
-                        <a href="{{my_url('guest/recent/2')}}" class="list-group-item">Images of orchid 1</a>
-                        <a href="{{my_url('guest/recent/3')}}" class="list-group-item">Images of Corridor</a>
-                        <a href="{{my_url('guest/recent/4')}}" class="list-group-item">Images of orchid 2</a>
+                        <a href="{{my_url('guest/recent/2')}}" class="list-group-item">Images of a orchid seed</a>
+                        <a href="{{my_url('guest/recent/3')}}" class="list-group-item">Images of a orchid</a>
                         <a href="{{my_url('guest/chart/3')}}" class="list-group-item">Charts in my office</a>
                     </div>
                 </div>
