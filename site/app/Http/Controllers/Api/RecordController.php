@@ -24,6 +24,12 @@ class RecordController extends Controller
         //$this->middleware('auth');
     }
 
+    private function isLooping($id)
+    {
+        if(50 <= $id && $id < 60) return true;
+        return false;
+    }
+
     public function updateCo2(Request $request)
     {
         return $this->updateRecord(function() use($request) {
@@ -135,8 +141,14 @@ class RecordController extends Controller
 
             $extension = $request->file('image')->getClientOriginalExtension();
             $now = Carbon::now();
-            $folder = sprintf("images/s%04d/%s", $request->input('sensor_id'), $now->format('ym'));
-            $filename = sprintf("%s.%s", $now->format('ymdH00'), $extension);
+            if($this->isLooping($request->input('sensor_id'))){
+                $now->minute = floor($now->minute / 3) * 3;
+                $folder = sprintf("images/s%04d/%s", $request->input('sensor_id'), $now->format('D'));
+                $filename = sprintf("%s.%s", $now->format('Hi'), $extension);
+            }else{
+                $folder = sprintf("images/s%04d/%s", $request->input('sensor_id'), $now->format('ym'));
+                $filename = sprintf("%s.%s", $now->format('ymdH00'), $extension);
+            }
 
             Storage::putFileAs($folder, $request->file('image'), $filename);
             $s->add('filename', $filename);
