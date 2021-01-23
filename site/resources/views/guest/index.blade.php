@@ -13,7 +13,7 @@
             @include('layouts.chart_js')
             <canvas id="canvas" style="height:50vh;"></canvas>
             <script>
-var temperature = new ChartController({label:"Temperature",url:"{!! my_url('api/record/select_temperature?sensor=1') !!}",canvas:"canvas",rgb:"rgb(192,128,128)",show_time:false});
+var temperature = new ChartController({label:"Temperature",url:"{!! my_url('api/record/select_temperature?sensor=3') !!}",canvas:"canvas",rgb:"rgb(192,128,128)",show_time:false});
 $(temperature.initialize);
             </script>
         </div>
@@ -25,12 +25,10 @@ $(temperature.initialize);
                 <div class="card-header">Home</div>
                 <div class="card-body">
                     <div class="list-group list-group-flush">
-                        <a href="{{my_url('guest/chart/1')}}" class="list-group-item">Charts in my room 1</a>
-                        <a href="{{my_url('guest/chart/2')}}" class="list-group-item">Charts in my room 2</a>
-                        <a href="{{my_url('guest/recent/1')}}" class="list-group-item">Images with infrared camera</a>
-                        <a href="{{my_url('guest/recent/2')}}" class="list-group-item">Images of a orchid seed</a>
-                        <a href="{{my_url('guest/recent/3')}}" class="list-group-item">Images of a orchid</a>
-                        <a href="{{my_url('guest/chart/3')}}" class="list-group-item">Charts in my office</a>
+                        <a href="{{my_url('guest/chart/1')}}" class="list-group-item">Charts in NULL</a>
+                        <a href="{{my_url('guest/chart/2')}}" class="list-group-item">Charts in my bedroom</a>
+                        <!-- <a href="{{my_url('guest/recent/1')}}" class="list-group-item">Images with infrared camera</a> -->
+                        <a href="{{my_url('guest/chart/3')}}" class="list-group-item">Charts in my living room</a>
                     </div>
                 </div>
             </div>
